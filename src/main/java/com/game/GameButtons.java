@@ -22,62 +22,61 @@ public class GameButtons {
 
     private GameButtons(){}
 
-    public void addButtonX(String s){
-        System.out.println("buttonX добавлена");
-        buttonsX.add(s);
-    }
-
-    public void addButtonO(String s){
-        System.out.println("buttonO добавлена");
-        buttonsO.add(s);
+    public void addButton(String type,String step){
+        if (type.equals("X")) {
+            System.out.println("buttonX добавлена");
+            buttonsX.add(step);
+        }
+        else {
+            System.out.println("buttonO добавлена");
+            buttonsO.add(step);
+        }
     }
 
     public String getButton(Integer x, Integer y){
-        String s = "";
+        Boolean bool = buttonCycle(x, y, "X");
+        if (!bool){
+            return "X";
+        }
+        else {
+            bool = buttonCycle(x, y, "O");
+            if (!bool){
+                return "O";
+            }
+        }
+        return "B";
+    }
+
+    private boolean buttonCycle(Integer x, Integer y, String type){
         Boolean bool = true;
-        for (int i = 0; i < buttonsX.size(); i++){
-            System.out.println(x.toString().charAt(0)+""+y.toString().charAt(0));
-            System.out.println(buttonsX.get(i).charAt(0) + "" + buttonsX.get(i).charAt(1));
+        ArrayList<String> buttons;
+        if (type.equals("X")){
+            buttons = buttonsX;
+        }
+        else {
+            buttons = buttonsO;
+        }
+        for (int i = 0; i < buttons.size(); i++){
+            System.out.println(x.toString().charAt(0) + "" + y.toString().charAt(0));
+            System.out.println(buttons.get(i).charAt(0) + "" + buttons.get(i).charAt(1));
             String num = x + "" + y;
-            if (buttonsX.get(i).equals(num)){
-                s = "<td id=\"" + x + y + "\"> " +
-                        "<img src =\"../resources/cross.png\" \">" +
-                        " </td>";
+            if (buttons.get(i).equals(num)){
                 bool = false;
-                System.out.println("Цикл на X завершился успешно");
+                System.out.println("Цикл на " + type + " завершился успешно");
                 break;
             }
-            System.out.println("Цикл на X идет...");
+            System.out.println("Цикл на " + type + " идет...");
         }
-        for (int i = 0; i < buttonsO.size(); i++){
-            System.out.println(x.toString().charAt(0)+""+y.toString().charAt(0));
-            System.out.println(buttonsO.get(i).charAt(0) + "" + buttonsO.get(i).charAt(1));
-            String num = x + "" + y;
-            if (buttonsO.get(i).equals(num)){
-                s = "<td id=\"" + x + y + "\"> " +
-                        "<img src =\"../resources/noll.png\" \">" +
-                        " </td>";
-                bool = false;
-                System.out.println("Цикл на O завершился успешно");
-                break;
-            }
-            System.out.println("Цикл на O идет...");
-        }
-        if (bool) {
-            s = "<td id=\"" + x + y + "\"> " +
-                    "<input class =\"button\" type=\"submit\" name=\"step\" value=\"" + x + y + "\" form=\"go\" style=\"text-indent: -9999px\">" +
-                    " </td>";
-        }
-        System.out.println(s);
-        return s;
+        return bool;
     }
 
-    public static ArrayList<String> getButtonsX() {
-        return buttonsX;
-    }
-
-    public static ArrayList<String> getButtonsO() {
-        return buttonsO;
+    public static ArrayList<String> getButtons(String type) {
+        if (type.equals("X")){
+            return buttonsX;
+        }
+        else {
+            return buttonsO;
+        }
     }
 
     public void resetButtons(){

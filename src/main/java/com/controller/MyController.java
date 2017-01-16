@@ -2,14 +2,10 @@ package com.controller;
 
 import com.game.GameButtons;
 import com.logistic.Logistic;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.ArrayList;
 
 /**
  * Created by Paul Brown on 09.01.2017.
@@ -18,11 +14,10 @@ import java.util.ArrayList;
 @Controller
 public class MyController {
 
-    private static ArrayList<String> oldstep;
+    private GameButtons game = GameButtons.getInstance();
 
-    private static GameButtons game = GameButtons.getInstance();
-
-    private static Logistic logistic = new Logistic();
+    @Autowired
+    private Logistic logistic;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView main() {
@@ -31,27 +26,37 @@ public class MyController {
         return modelAndView;
     }
 
-    @ResponseBody
     @RequestMapping(value = "/game", method = RequestMethod.GET)
     public ModelAndView game(@ModelAttribute("step") String s){
         ModelAndView modelAndView = new ModelAndView();
         System.out.println(s);
-        game.addButtonO(s);
-        String n = logistic.nextStep();
-        game.addButtonX(n);
-        modelAndView.setViewName("secondPage");
-        if (logistic.endGame()){
+        Boolean bool = logistic.endGame();
+        if (!s.equals("")) {
+            game.addButton("O", s);
+            bool = logistic.endGame();
+            if (!bool) {
+                String n = logistic.nextStep();
+                if (n.equals("No step")) {
+                    modelAndView.addObject("end", logistic.getWinner());
+                    System.out.println(logistic.getWinner());
+                } else {
+                    game.addButton("X", n);
+                    bool = logistic.endGame();
+                }
+            }
+        }
+        if (bool) {
             modelAndView.addObject("end", logistic.getWinner());
             System.out.println(logistic.getWinner());
         }
+        modelAndView.setViewName("secondPage");
         return modelAndView;
     }
 
-    @ResponseBody
     @RequestMapping(value = "/game", method = RequestMethod.POST)
     public ModelAndView gameInit() {
         ModelAndView modelAndView = new ModelAndView();
-        game.resetButtons();
+        logistic.reset();
         modelAndView.setViewName("secondPage");
         return modelAndView;
     }
